@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>一天一狗勾</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f4ed;
+    text-align: center;
+    padding: 40px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+h1 {
+    font-size: 38px;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+video {
+    width: 100%;
+    max-height: 70vh;
+    border-radius: 20px;
+    background: black;
+}
+
+button {
+    margin-top: 25px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    background: #222;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.status {
+    color: #777;
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🐶 今日狗狗视频 🐶</h1>
+
+<p class="subtitle">
+汪嗷～～～汪～～
+</p>
+
+<video
+id="dogVideo"
+controls
+autoplay
+muted
+loop>
+</video>
+
+<br>
+
+<button onclick="loadDog(true)">
+换一只狗狗</button>
+
+<p class="status" id="status">
+正在寻找狗狗...
+</p>
+
+</div>
+
+<script>
+const video = document.getElementById("dogVideo");
+const statusText = document.getElementById("status");
+
+const today = new Date().toDateString();
+
+async function loadDog(force = false) {
+
+    const savedDate =
+        localStorage.getItem("dogDate");
+
+    const savedVideo =
+        localStorage.getItem("dogVideo");
+
+    if (
+        !force &&
+        savedDate === today &&
+        savedVideo
+    ) {
+        video.src = savedVideo;
+        statusText.innerText =
+            "这是今天的幸运狗狗。";
+        return;
+    }
+
+    statusText.innerText =
+        "正在寻找今日狗狗...";
+
+    try {
+
+        const response =
+            await fetch(
+              "https://random.dog/woof.json?include=mp4,webm"
+            );
+
+        const data =
+            await response.json();
+
+        video.src = data.url;
+
+        localStorage.setItem(
+            "dogVideo",
+            data.url
+        );
+
+        localStorage.setItem(
+            "dogDate",
+            today
+        );
+
+        statusText.innerText =
+            "今日狗狗已送达。";
+
+    } catch(error) {
+
+        statusText.innerText =
+            "狗狗加载失败，请稍后再试。";
+
+        console.error(error);
+    }
+}
+
+loadDog();
+</script>
+
+</body>
+</html>
